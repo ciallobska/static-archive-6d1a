@@ -1,0 +1,122 @@
+name: sync
+
+# 这个仓库是 PCL Lite 的更新镜像。它只做一件事：把上游仓库原样搬过来。
+#
+# 为什么不直接在网页上点 Fork：fork 会进入同一个 fork network，上游仓库被
+# DMCA 处理时 fork 会被一并处理。这里是一个完全独立的仓库，靠定时任务同步。
+#
+# 注意：.github 目录本身不参与同步，否则这个 workflow 会被上游内容覆盖掉。
+
+on:
+  schedule:
+    - cron: "17 */2 * * *"   # 每两小时一次（UTC），错开整点
+  workflow_dispatch:
+    inputs:
+      release_limit:
+        description: "同步最近多少个 Release（0 = 只同步源码和 tag）"
+        required: false
+        default: "6"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync
+  cancel-in-progress: false
+
+env:
+  UPSTREAM: askbbtsk/pcl-lite
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: 检出本仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── 1. 源码 ────────────────────────────────────────────────
+      # 用 rsync 覆盖而不是 push --mirror：--mirror 会把本仓库的 .github 一起删掉，
+      # 下一次就没人来同步了。--delete 保证上游删掉的文件这里也跟着删。
+      - name: 同步源码
+        run: |
+          set -euo pipefail
+          git config user.name  "sync-bot"
+          git config user.email "sync-bot@users.noreply.github.com"
+
+          git clone --depth 1 --branch main "https://github.com/$UPSTREAM.git" /tmp/upstream
+          rsync -a --delete --exclude='.git' --exclude='.github' /tmp/upstream/ ./
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "源码已是最新"
+          else
+            git commit -m "sync: 跟随上游 $(git -C /tmp/upstream rev-parse --short HEAD)"
+            git push origin HEAD:main
+          fi
+
+      # ── 2. tag ────────────────────────────────────────────────
+      # 客户端按 tag 里的版本号比较大小，tag 名一个字符都不能改。
+      - name: 同步 tag
+        run: |
+          set -euo pipefail
+          git remote add upstream "https://github.com/$UPSTREAM.git" 2>/dev/null || true
+          git fetch upstream --tags --force
+          git push origin '+refs/tags/v*:refs/tags/v*' --force
+
+      # ── 3. Release 与资产 ─────────────────────────────────────
+      # git 传不了 Release 对象和附件，只能逐个重建。
+      # prerelease 标记必须和上游一致：稳定版通道会跳过被标成 prerelease 的 Release。
+      - name: 同步 Release
+        run: |
+          set -euo pipefail
+          LIMIT="${{ github.event.inputs.release_limit || '6' }}"
+          if [ "$LIMIT" = "0" ]; then echo "按要求跳过 Release 同步"; exit 0; fi
+
+          mkdir -p /tmp/rel
+          gh api --paginate "repos/$UPSTREAM/releases?per_page=100" > /tmp/rel/all.json
+
+          # 上游当前的最新正式版（isLatest 不可靠，这里取第一个非预发布）
+          LATEST=$(jq -r 'first(.[] | select(.prerelease == false) | .tag_name) // ""' /tmp/rel/all.json)
+          echo "上游最新正式版：$LATEST"
+
+          for TAG in $(jq -r ".[0:$LIMIT][].tag_name" /tmp/rel/all.json); do
+            if gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              echo "已存在，跳过 $TAG"
+              continue
+            fi
+
+            PRE=$(jq -r  --arg t "$TAG" '.[] | select(.tag_name==$t) | .prerelease' /tmp/rel/all.json)
+            NAME=$(jq -r --arg t "$TAG" '.[] | select(.tag_name==$t) | (.name // .tag_name)' /tmp/rel/all.json)
+            jq -r  --arg t "$TAG" '.[] | select(.tag_name==$t) | (.body // "")' /tmp/rel/all.json > /tmp/rel/notes.md
+
+            D="/tmp/rel/assets-$TAG"
+            mkdir -p "$D"
+            gh release download "$TAG" -R "$UPSTREAM" -D "$D" || true
+
+            ARGS=(--target main --title "$NAME" --notes-file /tmp/rel/notes.md)
+            [ "$PRE" = "true" ] && ARGS+=(--prerelease)
+            [ "$TAG" = "$LATEST" ] && ARGS+=(--latest)
+
+            shopt -s nullglob
+            ASSETS=("$D"/*)
+            if [ ${#ASSETS[@]} -gt 0 ]; then
+              gh release create "$TAG" -R "$GITHUB_REPOSITORY" "${ARGS[@]}" "${ASSETS[@]}"
+            else
+              gh release create "$TAG" -R "$GITHUB_REPOSITORY" "${ARGS[@]}"
+            fi
+            echo "已创建 $TAG（prerelease=$PRE）"
+          done
+
+      - name: 收尾自查
+        run: |
+          set -euo pipefail
+          echo "--- 身份标记 ---"
+          curl -sf "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/update.json"
+          echo
+          echo "--- Release 列表 ---"
+          gh release list -R "$GITHUB_REPOSITORY" --limit 10
