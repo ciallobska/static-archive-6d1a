@@ -1,7 +1,7 @@
 [
   {
     "SourcePath": "PCL.Core/Minecraft/Packs/PackExportContent.cs",
-    "Sha256": "E17E7EDE2CDC6B6959A26AF026B0EDB52FCDF8C790A7102F4A690FBB665B41B1",
+    "Sha256": "FAA72B48588BAC80115FF3C6827C489F9C0C6669B190C17D1A5EAB8855F78870",
     "Members": [
       "PCL.Core.Minecraft.Packs.PackExportContent::MethodDeclaration::IsInternalPath(string relativePath)",
       "PCL.Core.Minecraft.Packs.PackExportContent::MethodDeclaration::CopyTree(string source, string destination, CancellationToken token = default)"
@@ -107,7 +107,7 @@
 },
 {
   "SourcePath": "Plain Craft Launcher 2/Modules/Minecraft/ModLaunch.cs",
-  "Sha256": "54B422739B303BFB2BB1FE927CC911905D0D50E74F3BD7AB650DD1235DF729FE",
+  "Sha256": "25FC2DB5091612CDC0080110AB75D4F9CAE42ABF3FCA939E18958D6460A1BC3D",
   "Members": [
     "PCL.ModLaunch::MethodDeclaration::McLaunchPrecheck()"
   ],
@@ -156,5 +156,101 @@
   "Sha256": "4E2C0157FF25389E4AC94F41FD6F13FC989E7814333B444F877B029683BAFAC3",
   "Members": ["PCL.ModLaunch::MethodDeclaration::McLaunchJava(ModLoader.LoaderTask<int, int> task)"],
   "Reason": "Extract the ordered existing Java constraints unchanged into ResolveJavaConstraints for both normal launch and target validation; separate verifier compares every moved statement against baseline allowing only the instance parameter replacement."
+}
+,
+{
+  "SourcePath": "Plain Craft Launcher 2/Controls/MyMsg/MyMsgText.xaml.cs",
+  "Sha256": "026E2DB3FC8D7F7E59D6E600368EDB22AFC5AF26316E32C27A2869005E6D16D2",
+  "Members": [
+    "PCL.MyMsgText::ConstructorDeclaration::.ctor(ModMain.MyMsgBoxConverter converter)",
+    "PCL.MyMsgText::MethodDeclaration::Load(object sender, RoutedEventArgs e)",
+    "PCL.MyMsgText::MethodDeclaration::Close()",
+    "PCL.MyMsgText::MethodDeclaration::Btn1_Click(object? sender = null, MouseButtonEventArgs? e = null)"
+  ],
+  "Reason": "User-requested loader selection unlock and direct version/loader modification, backup acknowledgement with visible monotonic 5-second delay and optional mod migration with 3-second delay. Existing dialog defaults unchanged."
+},
+{
+  "SourcePath": "Plain Craft Launcher 2/Pages/PageInstance/PageInstanceInstall.SelectionPresentation.cs",
+  "Sha256": "2F0EE828A920301DE628C3AA668CE9EE3054001F1DE4C44536AA602740B191CA",
+  "Members": [
+    "PCL.PageInstanceInstall::MethodDeclaration::GetCurrentInfo()"
+  ],
+  "Reason": "User-requested loader selection unlock and direct version/loader modification, backup acknowledgement with visible monotonic 5-second delay and optional mod migration with 3-second delay. Existing dialog defaults unchanged."
+},
+{
+  "SourcePath": "Plain Craft Launcher 2/Pages/PageInstance/PageInstanceInstall.xaml.cs",
+  "Sha256": "BF02D5F525AC138E510341B6EAC97D4962D219288ADCD7DC2230983D1962DAA4",
+  "Members": [
+    "PCL.PageInstanceInstall::MethodDeclaration::BtnSelectStart_Click(object sender, MouseButtonEventArgs mouseButtonEventArgs)",
+    "PCL.PageInstanceInstall::MethodDeclaration::MinecraftSelected(MyListItem sender, MouseButtonEventArgs e)"
+  ],
+  "Reason": "User-requested loader selection unlock and direct version/loader modification, backup acknowledgement with visible monotonic 5-second delay and optional mod migration with 3-second delay. Existing dialog defaults unchanged."
+}
+,
+{
+  "SourcePath": "PCL.Core/Utils/Hash/HashCache.cs",
+  "Sha256": "B4EDE8DDA1797EBC585FDE6A840403BF9CADEE26ED6072A8365FC0807AAE2941",
+  "Members": [
+    "PCL.Core.Utils.Hash.HashCache::MethodDeclaration::_GetHashAsync(string filePath, IHashProvider provider, string algoName)",
+    "PCL.Core.Utils.Hash.HashCache::MethodDeclaration::_GetHashWithPending(string filePath, IHashProvider provider, string algoName)",
+    "PCL.Core.Utils.Hash.HashCache::MethodDeclaration::_ComputeHashAsync(string fullPath, IHashProvider provider)"
+  ],
+  "Reason": "User-reported long indexing and file-in-use: latest current-instance bounded workers, empty-tree fast path, per-instance cache locks, no-delete-blocking hash stream with fingerprint invalidation, cancellable native foreground progress instead of UI-thread recursive parsing."
+},
+{
+  "SourcePath": "Plain Craft Launcher 2/Modules/Minecraft/ModJarInJar.cs",
+  "Sha256": "449DBA8966C2F9EF66832EC88CF34990580EBAD4540770B5A68826B64A95C420",
+  "Members": [
+    "PCL.ModJarInJar::MethodDeclaration::ResolveCached(string modFilePath, ZipArchive jar,\n        out bool complete, bool deferOnMiss = false,\n        long? expectedLastModified = null, long? expectedSize = null, ScanContext? scan = null,\n        string? preferredLoader = null)",
+    "PCL.ModJarInJar::MethodDeclaration::_Resolve(string parentPath, ZipArchive jar, int depth,\n        _ResolveBudget budget)"
+  ],
+  "Reason": "User-reported long indexing and file-in-use: latest current-instance bounded workers, empty-tree fast path, per-instance cache locks, no-delete-blocking hash stream with fingerprint invalidation, cancellable native foreground progress instead of UI-thread recursive parsing."
+},
+{
+  "SourcePath": "Plain Craft Launcher 2/Modules/Minecraft/ModJarInJarCache.cs",
+  "Sha256": "4664773E0181216655C31FC3359AD7267DA4AF25FAC749602AAF6E7E5F8A70C8",
+  "Members": [
+    "PCL.ModJarInJarCache::MethodDeclaration::TryGet(string path, long lastModified, long size)",
+    "PCL.ModJarInJarCache::MethodDeclaration::Set(string path, long lastModified, long size, List<EmbeddedModNode> tree)",
+    "PCL.ModJarInJarCache::MethodDeclaration::Prune(IEnumerable<string> keepPaths)",
+    "PCL.ModJarInJarCache::MethodDeclaration::Flush()"
+  ],
+  "Reason": "User-reported long indexing and file-in-use: latest current-instance bounded workers, empty-tree fast path, per-instance cache locks, no-delete-blocking hash stream with fingerprint invalidation, cancellable native foreground progress instead of UI-thread recursive parsing."
+},
+{
+  "SourcePath": "Plain Craft Launcher 2/Modules/Minecraft/ModLocalComp.Members.GetFolderDescription.cs",
+  "Sha256": "71E971E1D862E5BEBF51D9CB2CAC83D6B084C067D2B4AA80B2A4F2E7EEFB4490",
+  "Members": [
+    "PCL.ModLocalComp::MethodDeclaration::_ResolveJijPendingBackground(List<LocalCompFile> pending, List<string> allModPaths,\n        string instancePath, int loaderTaskId, int generation)",
+    "PCL.ModLocalComp::MethodDeclaration::CompResourceListLoad(LoaderTask<CompLocalLoaderData, List<LocalCompFile>> loader)"
+  ],
+  "Reason": "User-reported long indexing and file-in-use: latest current-instance bounded workers, empty-tree fast path, per-instance cache locks, no-delete-blocking hash stream with fingerprint invalidation, cancellable native foreground progress instead of UI-thread recursive parsing."
+},
+{
+  "SourcePath": "Plain Craft Launcher 2/Pages/PageInstance/PageInstanceCompResource.SelectionActions.BtnSelectED_Click.cs",
+  "Sha256": "73AAD94B1C348955067196172FAFE6888B5C8E8C54D4FE016AF6E5236E81D612",
+  "Members": [
+    "PCL.PageInstanceCompResource::MethodDeclaration::_ConfirmCascadeReady()"
+  ],
+  "Reason": "User-reported long indexing and file-in-use: latest current-instance bounded workers, empty-tree fast path, per-instance cache locks, no-delete-blocking hash stream with fingerprint invalidation, cancellable native foreground progress instead of UI-thread recursive parsing."
+}
+,
+{
+  "SourcePath": "PCL.Core/App/Updates/UpdateChannelLevels.cs",
+  "Sha256": "E7E7E0998A9FAC2A276BDDBE7D920776F2A254388A55BCEB83F96288DF6CDF12",
+  "Members": [
+    "PCL.Core.App.Updates.UpdateChannelLevels::MethodDeclaration::FromSuffix(string? suffix)"
+  ],
+  "Reason": "Snapshot-3 hotfix must remain on snapshot channel, follow snapshot-3, and precede snapshot-4 and stable. Plain stable hotfix ordering unchanged; regression tests cover mixed suffix."
+},
+{
+  "SourcePath": "PCL.Core/App/Updates/UpdateVersion.cs",
+  "Sha256": "82BFBCD999954021073416A1FA38B53CB71B0A3E86692400C734FD8D4A326F11",
+  "Members": [
+    "PCL.Core.App.Updates.UpdateVersion::MethodDeclaration::_RankOf(string suffix)",
+    "PCL.Core.App.Updates.UpdateVersion::MethodDeclaration::_SequenceOf(string suffix)",
+    "PCL.Core.App.Updates.UpdateVersion::MethodDeclaration::_FamilyOf(string suffix)"
+  ],
+  "Reason": "Snapshot-3 hotfix must remain on snapshot channel, follow snapshot-3, and precede snapshot-4 and stable. Plain stable hotfix ordering unchanged; regression tests cover mixed suffix."
 }
 ]
