@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -659,6 +659,28 @@ public partial class PageInstanceCompResource : IRefreshable
         ToolTipService.SetHorizontalOffset(btnCont, 2d);
         btnCont.Click += Info_Click;
         sender.MouseRightButtonUp += Info_Click;
+        MyIconButton? btnFavorite = null;
+        if (!sender.Entry.IsFolder && sender.Entry.Comp is { } favoriteProject)
+        {
+            btnFavorite = new MyIconButton
+            {
+                LogoScale = 1d,
+                SvgIcon = ModComp.CompFavorites.IsFavourite(favoriteProject.Id) ? "lucide/heart-filled" : "lucide/heart",
+                Tag = sender
+            };
+            btnFavorite.ToolTip = Lang.Text("Download.Comp.Favorites.Action.Manage");
+            ToolTipService.SetPlacement(btnFavorite, PlacementMode.Center);
+            ToolTipService.SetVerticalOffset(btnFavorite, 30d);
+            ToolTipService.SetHorizontalOffset(btnFavorite, 2d);
+            btnFavorite.Click += (_, _) => ModComp.CompFavorites.ShowMenu(favoriteProject, btnFavorite, () =>
+            {
+                if (btnFavorite is not null)
+                    btnFavorite.SvgIcon = ModComp.CompFavorites.IsFavourite(favoriteProject.Id)
+                        ? "lucide/heart-filled"
+                        : "lucide/heart";
+            });
+        }
+
         var btnDelete = new MyIconButton { LogoScale = 1d, SvgIcon = "lucide/trash-2", Tag = sender };
         btnDelete.ToolTip = Lang.Text("Common.Action.Delete");
         ToolTipService.SetPlacement(btnDelete, PlacementMode.Center);
@@ -668,7 +690,9 @@ public partial class PageInstanceCompResource : IRefreshable
         if (currentCompType != ModComp.CompType.Mod ||
             sender.Entry.State == ModLocalComp.LocalCompFile.LocalFileStatus.Unavailable)
         {
-            sender.Buttons = new[] { btnCont, btnOpen, btnDelete };
+            sender.Buttons = btnFavorite is null
+                ? new[] { btnCont, btnOpen, btnDelete }
+                : new[] { btnCont, btnOpen, btnFavorite, btnDelete };
         }
         else
         {
@@ -685,7 +709,9 @@ public partial class PageInstanceCompResource : IRefreshable
             ToolTipService.SetVerticalOffset(btnED, 30d);
             ToolTipService.SetHorizontalOffset(btnED, 2d);
             btnED.Click += (ss, ee) => ED_Click((MyIconButton)ss, ee);
-            sender.Buttons = new[] { btnCont, btnOpen, btnED, btnDelete };
+            sender.Buttons = btnFavorite is null
+                ? new[] { btnCont, btnOpen, btnED, btnDelete }
+                : new[] { btnCont, btnOpen, btnED, btnFavorite, btnDelete };
         }
     }
 
@@ -2257,7 +2283,7 @@ public partial class PageInstanceCompResource : IRefreshable
                     foreach (var Entry in modList)
                         if (File.Exists(Entry.path))
                             Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(Entry.path, UIOption.AllDialogs,
-                                RecycleOption.SendToRecycleBin);
+                                Config.Launch.DeleteToRecycleBin ? RecycleOption.SendToRecycleBin : RecycleOption.DeletePermanently);
                         else
                             ModBase.Log($"[CompUpdate] 未找到更新前的资源文件，跳过对它的删除：{Entry.path}", ModBase.LogLevel.Debug);
 
@@ -2266,8 +2292,8 @@ public partial class PageInstanceCompResource : IRefreshable
                         if (File.Exists(Entry.Value))
                         {
                             Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(Entry.Value, UIOption.AllDialogs,
-                                RecycleOption.SendToRecycleBin);
-                            ModBase.Log($"[Mod] 更新后的资源文件已存在，将会把它放入回收站：{Entry.Value}", ModBase.LogLevel.Debug);
+                                Config.Launch.DeleteToRecycleBin ? RecycleOption.SendToRecycleBin : RecycleOption.DeletePermanently);
+                            ModBase.Log($"[Mod] 更新后的资源文件已存在，将按删除设置处理旧文件：{Entry.Value}", ModBase.LogLevel.Debug);
                         }
 
                         if (Directory.Exists(ModBase.GetPathFromFullPath(Entry.Value)))
@@ -2405,25 +2431,13 @@ public partial class PageInstanceCompResource : IRefreshable
                 // 删除
                 try
                 {
+                    var sourcePath = ModEntity.IsFolder ? ModEntity.ActualPath : ModEntity.path;
+                    var recycle = !isShiftPressed && Config.Launch.DeleteToRecycleBin
+                        ? RecycleOption.SendToRecycleBin : RecycleOption.DeletePermanently;
                     if (ModEntity.IsFolder)
-                    {
-                        // 删除文件夹
-                        if (isShiftPressed)
-                            Directory.Delete(ModEntity.ActualPath, true);
-                        else
-                            Microsoft.VisualBasic.FileIO.FileSystem.DeleteDirectory(ModEntity.ActualPath,
-                                UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
-                    }
-                    // 删除文件
-                    else if (isShiftPressed)
-                    {
-                        File.Delete(ModEntity.path);
-                    }
+                        Microsoft.VisualBasic.FileIO.FileSystem.DeleteDirectory(sourcePath, UIOption.OnlyErrorDialogs, recycle);
                     else
-                    {
-                        Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(ModEntity.path, UIOption.OnlyErrorDialogs,
-                            RecycleOption.SendToRecycleBin);
-                    }
+                        Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(sourcePath, UIOption.OnlyErrorDialogs, recycle);
                 }
                 catch (OperationCanceledException ex)
                 {
@@ -2472,7 +2486,7 @@ public partial class PageInstanceCompResource : IRefreshable
             // 显示结果提示
             if (!isSuccessful)
                 return;
-            if (isShiftPressed)
+            if (isShiftPressed || !Config.Launch.DeleteToRecycleBin)
             {
                 if (modList.Count() == 1)
                     HintService.Hint(Lang.Text("Instance.Resource.Delete.PermanentSingle", modList.Single().FileName), HintType.Success);
