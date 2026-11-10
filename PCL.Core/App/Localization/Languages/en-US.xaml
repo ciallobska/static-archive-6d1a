@@ -5,6 +5,22 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xml:space="preserve">
 
+    <sys:String x:Key="Setup.GameManage.ModIndex.Title">Mod dependency index</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.Description">Index every instance in all Minecraft folders discovered by PCL, including unselected and hidden instances. Shared mod folders with the same parser context are scanned once. Idle browsing does not build indexes; mod downloads still update them.</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.Discovering">Discovering instances across all Minecraft folders. You can cancel. Your home-page selection will stay unchanged.</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.AllProgress">Instances processed: {0} / {1}&#xA;Current instance: {2}&#xA;Mod files processed for this instance: {3}</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.AllResult">All-instance indexing ended: {0} instances succeeded, {1} items failed. Completed entries are kept on cancellation.</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.AllFailed">These instances or folders could not be indexed. Other instances were processed. See the log for details:</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.Create">Create index now</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.PromptSetting">Offer to create missing indexes when opening the mods page</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.NoInstance">Select an instance on the home page before creating its index.</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.Working">Creating the index for “{0}”. You can cancel; completed entries will be saved. Files processed:</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.Complete">Mod index created.</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.Incomplete">Indexing was cancelled or some files could not be indexed. Completed entries are saved; see the log and retry later.</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.Prompt">Some mods in “{0}” have no index yet. Nested mod and dependency checks may be incomplete. Create the index now? You can also use “Create index now” in Settings → Game management later.</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.Later">Later</sys:String>
+    <sys:String x:Key="Setup.GameManage.ModIndex.Never">Don't ask again</sys:String>
+
     <!-- Meta -->
 
     <sys:String x:Key="Meta.Code">en-US</sys:String>
@@ -1144,8 +1160,8 @@
     <sys:String x:Key="Instance.Resource.Mod.JarInJar.Entry">Mod Relations</sys:String>
     <sys:String x:Key="Instance.Resource.Mod.JarInJar.Entry.ToolTip">View mod dependencies, missing prerequisites and bundled (Jar-in-Jar) structure</sys:String>
     <sys:String x:Key="Instance.Resource.Mod.JarInJar.Message">An overview of dependencies and bundled structure between mods. Disabling or deleting a mod will warn about affected dependencies.</sys:String>
-    <sys:String x:Key="Instance.Resource.Mod.JarInJar.ParsePending.Title">Mods still loading</sys:String>
-    <sys:String x:Key="Instance.Resource.Mod.JarInJar.ParsePending.Message">Embedded mod relationships are still being analyzed in the background. Dependency cascade detection may be incomplete right now and could miss mods that should be handled together. Continue anyway?</sys:String>
+    <sys:String x:Key="Instance.Resource.Mod.JarInJar.ParsePending.Title">Mod index is incomplete</sys:String>
+    <sys:String x:Key="Instance.Resource.Mod.JarInJar.ParsePending.Message">Some nested mod relationships have not been indexed, so disabling or deleting mods may miss related dependencies. Continuing will first create the missing index. You can cancel; the original operation runs only after indexing finishes.</sys:String>
     <sys:String x:Key="Instance.Resource.Mod.JarInJar.Empty.Title">No mod relations to analyze</sys:String>
     <sys:String x:Key="Instance.Resource.Mod.JarInJar.Empty.Message">None of this instance's mods declare dependencies or bundle other mods, or the mod list has not finished loading.</sys:String>
     <sys:String x:Key="Instance.Resource.Mod.JarInJar.Section.Warnings">Warnings</sys:String>
