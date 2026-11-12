@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xml:space="preserve">
-    <sys:String x:Key="Setup.About.ReleaseDescription">1.7.7 stable: live desktop refraction allows screenshots and recording without global capture exclusion. Fixes the solid blue title strip after theme changes and dark glass captions. Personalization can hide the floating search button while keeping Ctrl+K. Includes both 1.7.6 hotfixes.</sys:String>
+    <sys:String x:Key="Setup.About.ReleaseDescription">1.7.7 hotfix-2: removes the square shadow seams still visible outside glass corners after hotfix-1. Glass mode hides the legacy small-corner shadow and restores it unchanged when disabled. Retains the sampler corner fix, screenshots and recording.</sys:String>
     <sys:String x:Key="Setup.Ui.LiquidGlass.Preset">Performance preset</sys:String>
     <sys:String x:Key="Setup.Ui.LiquidGlass.Preset.0">Low power</sys:String>
     <sys:String x:Key="Setup.Ui.LiquidGlass.Preset.1">Balanced</sys:String>
